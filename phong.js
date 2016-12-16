@@ -1,6 +1,7 @@
 var tube = {
   verts: null,
   normals: null,
+  tangets: null,
   createGeometry: function() {
       var N = this.N, M = this.M;
       var a = this.a, b = this.b;
@@ -9,6 +10,7 @@ var tube = {
       var sz = (N + 1) * (M + 1) * 3;
       this.verts = new Float32Array(sz);
       this.normals = new Float32Array(sz);
+      this.tangents = new Float32Array(3*(this.N+1)*(this.M+1));
       var n = 0;
       var dt = 2 * Math.PI / N;
       var du = 2 * Math.PI / M;
@@ -36,6 +38,7 @@ var tube = {
               for (var k = 0; k < 3; k++) {
                   this.normals[n] = cosu * N_[k] + sinu * B[k];
                   this.verts[n] = C[k] + R * this.normals[n];
+                  this.tangents[n] = T[k]; // added tangent vector
                   n++;
               };
           };

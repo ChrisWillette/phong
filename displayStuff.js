@@ -96,21 +96,28 @@ function init(N, M, p, q, a, b, R) {
   tube.texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, tube.texCoords, gl.STATIC_DRAW);
+  tube.tangentBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tube.tangentBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, tube.tangents, gl.STATIC_DRAW);
   program.vertexPosition = gl.getAttribLocation(program, 'vertexPosition');
   program.vertexNormal = gl.getAttribLocation(program, 'vertexNormal');
   program.ModelViewProjection = gl.getUniformLocation(program, 'ModelViewProjection');
   program.ModelViewMatrix = gl.getUniformLocation(program, 'ModelViewMatrix');
   program.NormalMatrix = gl.getUniformLocation(program, 'NormalMatrix');
   program.TextureMatrix = gl.getUniformLocation(program, "TextureMatrix");
-  program.vertexNormal = gl.getAttribLocation(program, "vertexNormal");
   program.vertexTexCoord = gl.getAttribLocation(program, "vertexTexCoord");
+  program.vertexTangent = gl.getAttribLocation(program, "vertexTangent");
   program.ambientLight = gl.getUniformLocation(program, 'ambientLight');
   program.light0Color = gl.getUniformLocation(program, 'light0Color');
   program.light0Position = gl.getUniformLocation(program, 'light0Position');
-  program.materialAmbient = gl.getUniformLocation(program, 'materialAmbient');
-  program.materialDiffuse = gl.getUniformLocation(program, 'materialDiffuse');
-  program.materialSpecular = gl.getUniformLocation(program, 'materialSpecular');
-  program.materialShininess = gl.getUniformLocation(program, 'materialShininess');  
+  program.material0Ambient = gl.getUniformLocation(program, 'material0Ambient');
+  program.material0Diffuse = gl.getUniformLocation(program, 'material0Diffuse');
+  program.material0Specular = gl.getUniformLocation(program, 'material0Specular');
+  program.material0Shininess = gl.getUniformLocation(program, 'material0Shininess');
+  program.material1Ambient = gl.getUniformLocation(program, 'material1Ambient');
+  program.material1Diffuse = gl.getUniformLocation(program, 'material1Diffuse');
+  program.material1Specular = gl.getUniformLocation(program, 'material1Specular');
+  program.material1Shininess = gl.getUniformLocation(program, 'material1Shininess');    
   
   program.texUnit = gl.getUniformLocation(program, "texUnit");
   program.texture = gl.createTexture();
@@ -122,7 +129,7 @@ function init(N, M, p, q, a, b, R) {
       new Uint8Array([255, 255, 0, 255])); // yellow
 
   var textureImage = new Image();
-  textureImage.src = 'sample.jpg';
+  textureImage.src = 'lion.png';
   textureImage.onload = function() {
     var isPowerOfTwo = function(value) {
       return (value & (value - 1)) == 0;
@@ -146,10 +153,16 @@ function init(N, M, p, q, a, b, R) {
   }
   gl.uniform1i(program.texUnit, 0);
 
-  gl.uniform3fv(program.materialAmbient, [0.1, 0.1, 0.1]);
-  gl.uniform3fv(program.materialDiffuse, [0.1, 0.6, 0.6]);
-  gl.uniform3fv(program.materialSpecular, [0.3, 0.3, 0.3]);
-  gl.uniform1f(program.materialShininess, 10.0);
+  gl.uniform3fv(program.material0Ambient, [0.1, 0.1, 0.1]);
+  gl.uniform3fv(program.material0Diffuse, [0.6, 0.6, 0.6]);
+  gl.uniform3fv(program.material0Specular, [0.8, 0.8, 0.8]);
+  gl.uniform1f(program.material0Shininess, 10.0);
+  gl.uniform3fv(program.material1Ambient, [1, 1, 1]);
+  gl.uniform3fv(program.material1Diffuse, [.4, 0.4, 0.4]);
+  gl.uniform3fv(program.material1Specular, [0.1, 0.1, 0.1]);
+  gl.uniform1f(program.material1Shininess, 1.0);
+  
+
   gl.uniform3fv(program.ambientLight, [0.3, 0.3, 0.3]);
   gl.uniform3fv(program.light0Color, [1.0, 1.0, 1.0]);
   gl.uniform3fv(program.light0Position, [10.0, 10.0, 30.0]);
@@ -165,7 +178,7 @@ function init(N, M, p, q, a, b, R) {
   //TextureMatrix.scale(38, 2, 1);
   camera = {};
   camera.lookat = {x: 0, y: 0, z: 0};
-  camera.distance = 40;
+  camera.distance = 25;
   camera.phi = Math.PI / 6;
   camera.theta = Math.PI / 4;
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -201,10 +214,13 @@ function display() {
   gl.bindBuffer(gl.ARRAY_BUFFER, tube.normBuffer);
   gl.enableVertexAttribArray(program.vertexNormal);
   gl.vertexAttribPointer(program.vertexNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.uniformMatrix3fv(program.NormalMatrix, false, NormalMatrix);
+  //gl.uniformMatrix3fv(program.NormalMatrix, false, NormalMatrix);
   gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
   gl.enableVertexAttribArray(program.vertexTexCoord);
   gl.vertexAttribPointer(program.vertexTexCoord, 2, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, tube.tangentBuffer);
+	gl.enableVertexAttribArray(program.vertexTangent);
+	gl.vertexAttribPointer(program.vertexTangent, 3, gl.FLOAT, false, 0, 0);
   gl.uniformMatrix4fv(program.TextureMatrix, false, Texture.array);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tube.triangleStripBuffer);
   gl.drawElements(gl.TRIANGLE_STRIP, tube.triangleStrip.length, gl.UNSIGNED_SHORT, 0);
