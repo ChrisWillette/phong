@@ -127,6 +127,8 @@ function init(N, M, p, q, a, b, R) {
   View = new Matrix4x4;
   Model = new Matrix4x4;
   Texture = new Matrix4x4;
+  TextureMatrix = new Matrix4x4;
+  TextureMatrix.scale(38, 2, 1);
   camera = {};
   camera.lookat = {x: 0, y: 0, z: 0};
   camera.distance = 25;
