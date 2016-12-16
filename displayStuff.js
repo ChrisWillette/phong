@@ -8,8 +8,8 @@ var Model, View, Projection, Texture;
 function getMousePos(canvas, event) {
   var rect = canvas.getBoundingClientRect();
   return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
   };
 };
 var mouseDrag;
@@ -24,22 +24,22 @@ var frame;
 
 function mouseMove(event) {
   if (mouseDrag) {
-      var mousePos = getMousePos(canvas, event);
-      var dx = mousePos.x - mouseDrag.x;
-      var dy = mousePos.y - mouseDrag.y;
-      camera.theta += dx * radiansPerPixel;
-      camera.phi += dy * radiansPerPixel;
-      if (camera.phi < phiMin) {
-          camera.phi = phiMin;
-      } else {
-          if (camera.phi > phiMax) {
-              camera.phi = phiMax;
-          };
+    var mousePos = getMousePos(canvas, event);
+    var dx = mousePos.x - mouseDrag.x;
+    var dy = mousePos.y - mouseDrag.y;
+    camera.theta += dx * radiansPerPixel;
+    camera.phi += dy * radiansPerPixel;
+    if (camera.phi < phiMin) {
+      camera.phi = phiMin;
+    } else {
+      if (camera.phi > phiMax) {
+        camera.phi = phiMax;
       };
-      mouseDrag = mousePos;
-      if (!frame) {
-          frame = requestAnimationFrame(display);
-      };
+    };
+    mouseDrag = mousePos;
+    if (!frame) {
+      frame = requestAnimationFrame(display);
+    };
   };
 };
 
@@ -58,16 +58,16 @@ function init(N, M, p, q, a, b, R) {
   gl.shaderSource(vs, v);
   gl.compileShader(vs);
   if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS)) {
-      alert(gl.getShaderInfoLog(vs));
-      return false;
+    alert(gl.getShaderInfoLog(vs));
+    return false;
   };
   var f = document.getElementById('fragment').firstChild.nodeValue;
   var fs = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fs, f);
   gl.compileShader(fs);
   if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS)) {
-      alert(gl.getShaderInfoLog(fs));
-      return false;
+    alert(gl.getShaderInfoLog(fs));
+    return false;
   };
   program = gl.createProgram();
   gl.attachShader(program, vs);
@@ -110,7 +110,42 @@ function init(N, M, p, q, a, b, R) {
   program.materialAmbient = gl.getUniformLocation(program, 'materialAmbient');
   program.materialDiffuse = gl.getUniformLocation(program, 'materialDiffuse');
   program.materialSpecular = gl.getUniformLocation(program, 'materialSpecular');
-  program.materialShininess = gl.getUniformLocation(program, 'materialShininess');
+  program.materialShininess = gl.getUniformLocation(program, 'materialShininess');  
+  
+  program.texUnit = gl.getUniformLocation(program, "texUnit");
+  program.texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, program.texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,  1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+      new Uint8Array([255, 255, 0, 255])); // yellow
+
+  var textureImage = new Image();
+  textureImage.src = 'sample.jpg';
+  textureImage.onload = function() {
+    var isPowerOfTwo = function(value) {
+      return (value & (value - 1)) == 0;
+    }
+    gl.bindTexture(gl.TEXTURE_2D, program.texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, textureImage);
+    if (isPowerOfTwo(textureImage.width) && isPowerOfTwo(textureImage.height)) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, 
+        gl.LINEAR_MIPMAP_LINEAR);
+    } else {  // NPOT
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    }
+    frame = requestAnimationFrame(display);
+  }
+  gl.uniform1i(program.texUnit, 0);
+
   gl.uniform3fv(program.materialAmbient, [0.1, 0.1, 0.1]);
   gl.uniform3fv(program.materialDiffuse, [0.1, 0.6, 0.6]);
   gl.uniform3fv(program.materialSpecular, [0.3, 0.3, 0.3]);
@@ -118,20 +153,19 @@ function init(N, M, p, q, a, b, R) {
   gl.uniform3fv(program.ambientLight, [0.3, 0.3, 0.3]);
   gl.uniform3fv(program.light0Color, [1.0, 1.0, 1.0]);
   gl.uniform3fv(program.light0Position, [10.0, 10.0, 30.0]);
-  gl.clearColor(0, 0, 0.3, 1);
+  gl.clearColor(0,0,0,0);
   gl.uniform3fv(program.fragColor, [1.0, 1.0, 0.0]);
-  TextureMatrix = new Matrix4x4;
-  TextureMatrix.scale(38, 2, 1);
   Projection = new Matrix4x4;
   Projection.perspective(40, 1, 0.1, 100);
   View = new Matrix4x4;
   Model = new Matrix4x4;
   Texture = new Matrix4x4;
-  TextureMatrix = new Matrix4x4;
-  TextureMatrix.scale(38, 2, 1);
+  Texture.scale(38, 2, 1);
+  //TextureMatrix = new Matrix4x4;
+  //TextureMatrix.scale(38, 2, 1);
   camera = {};
   camera.lookat = {x: 0, y: 0, z: 0};
-  camera.distance = 25;
+  camera.distance = 40;
   camera.phi = Math.PI / 6;
   camera.theta = Math.PI / 4;
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -168,6 +202,9 @@ function display() {
   gl.enableVertexAttribArray(program.vertexNormal);
   gl.vertexAttribPointer(program.vertexNormal, 3, gl.FLOAT, false, 0, 0);
   gl.uniformMatrix3fv(program.NormalMatrix, false, NormalMatrix);
+  gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
+  gl.enableVertexAttribArray(program.vertexTexCoord);
+  gl.vertexAttribPointer(program.vertexTexCoord, 2, gl.FLOAT, false, 0, 0);
   gl.uniformMatrix4fv(program.TextureMatrix, false, Texture.array);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tube.triangleStripBuffer);
   gl.drawElements(gl.TRIANGLE_STRIP, tube.triangleStrip.length, gl.UNSIGNED_SHORT, 0);

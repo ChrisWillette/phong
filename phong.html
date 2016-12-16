@@ -90,7 +90,7 @@
 	<h1>Phong Shaded Torus with Spatially Varying Material Properties</h1>
 
 	<canvas id="myCanvas" width="400" height="400"></canvas><br />
-	Click and drag to rotate...<br>
+	Click and drag to rotate<br>
 
 <input min="1" max="10" value="2" oninput="changeTube('p', this)" onchange="changeTube('p', this)" type="range">p - winds around origin
 <label id="p">2</label><br>
@@ -107,9 +107,10 @@
 			document.getElementById('q').innerHTML = factor.value;
 		};
 		tube.createGeometry();
+		tube.createTriangleStrip();
+		tube.createTexCoords();
 		gl.bindBuffer(gl.ARRAY_BUFFER, tube.vertBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, tube.verts, gl.STATIC_DRAW);
-		tube.createTexCoords();
 		gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, tube.texCoords, gl.STATIC_DRAW);
 		frame = requestAnimationFrame(display);
