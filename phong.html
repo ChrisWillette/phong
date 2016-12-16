@@ -92,6 +92,31 @@
 	<canvas id="myCanvas" width="400" height="400"></canvas><br />
 	Click and drag to rotate...<br>
 
+<input min="1" max="10" value="2" oninput="changeTube('p', this)" onchange="changeTube('p', this)" type="range">p - winds around origin
+<label id="p">2</label><br>
+<input min="1" max="15" value="5" oninput="changeTube('q', this)" onchange="changeTube('q', this)" type="range">number of coils
+<label id="q">2</label><br>
+
+<script>
+	function changeTube(label, factor){    
+		if(label == 'p'){  
+			tube.p = factor.value;
+			document.getElementById('p').innerHTML = factor.value;
+		}else{
+			tube.q = factor.value;
+			document.getElementById('q').innerHTML = factor.value;
+		};
+		tube.createGeometry();
+		gl.bindBuffer(gl.ARRAY_BUFFER, tube.vertBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, tube.verts, gl.STATIC_DRAW);
+		tube.createTexCoords();
+		gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, tube.texCoords, gl.STATIC_DRAW);
+		frame = requestAnimationFrame(display);
+	}
+</script>
+
+
 	<hr>
 	<footer>
 		Chris Willette<br />
