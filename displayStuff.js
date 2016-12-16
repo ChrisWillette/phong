@@ -3,7 +3,7 @@ var gl;
 var canvas;
 var program;
 var camera;
-var Model, View, Projection;
+var Model, View, Projection, Texture;
 
 function getMousePos(canvas, event) {
   var rect = canvas.getBoundingClientRect();
@@ -83,6 +83,7 @@ function init(N, M, p, q, a, b, R) {
   tube.R = R;
   tube.createGeometry();
   tube.createTriangleStrip();
+  tube.createTexCoords();
   tube.vertBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, tube.vertBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, tube.verts, gl.STATIC_DRAW);
@@ -92,11 +93,17 @@ function init(N, M, p, q, a, b, R) {
   tube.triangleStripBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tube.triangleStripBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, tube.triangleStrip, gl.STATIC_DRAW);
+  tube.texCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, tube.texCoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, tube.texCoords, gl.STATIC_DRAW);
   program.vertexPosition = gl.getAttribLocation(program, 'vertexPosition');
   program.vertexNormal = gl.getAttribLocation(program, 'vertexNormal');
   program.ModelViewProjection = gl.getUniformLocation(program, 'ModelViewProjection');
   program.ModelViewMatrix = gl.getUniformLocation(program, 'ModelViewMatrix');
   program.NormalMatrix = gl.getUniformLocation(program, 'NormalMatrix');
+  program.TextureMatrix = gl.getUniformLocation(program, "TextureMatrix");
+  program.vertexNormal = gl.getAttribLocation(program, "vertexNormal");
+  program.vertexTexCoord = gl.getAttribLocation(program, "vertexTexCoord");
   program.ambientLight = gl.getUniformLocation(program, 'ambientLight');
   program.light0Color = gl.getUniformLocation(program, 'light0Color');
   program.light0Position = gl.getUniformLocation(program, 'light0Position');
@@ -113,16 +120,15 @@ function init(N, M, p, q, a, b, R) {
   gl.uniform3fv(program.light0Position, [10.0, 10.0, 30.0]);
   gl.clearColor(0, 0, 0.3, 1);
   gl.uniform3fv(program.fragColor, [1.0, 1.0, 0.0]);
+  TextureMatrix = new Matrix4x4;
+  TextureMatrix.scale(38, 2, 1);
   Projection = new Matrix4x4;
   Projection.perspective(40, 1, 0.1, 100);
   View = new Matrix4x4;
   Model = new Matrix4x4;
+  Texture = new Matrix4x4;
   camera = {};
-  camera.lookat = {
-      x: 0,
-      y: 0,
-      z: 0
-  };
+  camera.lookat = {x: 0, y: 0, z: 0};
   camera.distance = 25;
   camera.phi = Math.PI / 6;
   camera.theta = Math.PI / 4;
@@ -159,6 +165,8 @@ function display() {
   gl.bindBuffer(gl.ARRAY_BUFFER, tube.normBuffer);
   gl.enableVertexAttribArray(program.vertexNormal);
   gl.vertexAttribPointer(program.vertexNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.uniformMatrix3fv(program.NormalMatrix, false, NormalMatrix);
+  gl.uniformMatrix4fv(program.TextureMatrix, false, Texture.array);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tube.triangleStripBuffer);
   gl.drawElements(gl.TRIANGLE_STRIP, tube.triangleStrip.length, gl.UNSIGNED_SHORT, 0);
   gl.flush();
