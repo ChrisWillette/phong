@@ -1,4 +1,4 @@
-
+//chris willette
 var gl;
 var canvas;
 var program;
@@ -117,8 +117,7 @@ function init(N, M, p, q, a, b, R) {
   program.material1Ambient = gl.getUniformLocation(program, 'material1Ambient');
   program.material1Diffuse = gl.getUniformLocation(program, 'material1Diffuse');
   program.material1Specular = gl.getUniformLocation(program, 'material1Specular');
-  program.material1Shininess = gl.getUniformLocation(program, 'material1Shininess');    
-  
+  program.material1Shininess = gl.getUniformLocation(program, 'material1Shininess');  
   program.texUnit = gl.getUniformLocation(program, "texUnit");
   program.texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, program.texture);
@@ -154,11 +153,11 @@ function init(N, M, p, q, a, b, R) {
   gl.uniform1i(program.texUnit, 0);
 
   gl.uniform3fv(program.material0Ambient, [0.1, 0.1, 0.1]);
-  gl.uniform3fv(program.material0Diffuse, [0.6, 0.6, 0.6]);
+  gl.uniform3fv(program.material0Diffuse, [0.9, 0.1, 0.1]);
   gl.uniform3fv(program.material0Specular, [0.8, 0.8, 0.8]);
   gl.uniform1f(program.material0Shininess, 10.0);
   gl.uniform3fv(program.material1Ambient, [1, 1, 1]);
-  gl.uniform3fv(program.material1Diffuse, [.4, 0.4, 0.4]);
+  gl.uniform3fv(program.material1Diffuse, [.1, 0.2, 0.7]);
   gl.uniform3fv(program.material1Specular, [0.1, 0.1, 0.1]);
   gl.uniform1f(program.material1Shininess, 1.0);
   
@@ -174,8 +173,6 @@ function init(N, M, p, q, a, b, R) {
   Model = new Matrix4x4;
   Texture = new Matrix4x4;
   Texture.scale(38, 2, 1);
-  //TextureMatrix = new Matrix4x4;
-  //TextureMatrix.scale(38, 2, 1);
   camera = {};
   camera.lookat = {x: 0, y: 0, z: 0};
   camera.distance = 25;
