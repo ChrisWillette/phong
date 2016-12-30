@@ -1,5 +1,6 @@
 chris willette
-c.willette@wsu.edu
+
+christopher.willette@gmail.com
 
 A twist (pun intended) on the toroidal spiral program. Here, we implement a texture according to varying material properties on the surface.
 
