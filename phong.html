@@ -92,25 +92,57 @@
 
 </head>
 <body onload="init(300, 128, 2, 5, 6.0, 2.0, 1); display()">
-	<!-- 				init(N, M, p, q, a, b, R)-->
+	<!-- 	  init(N,   M,   p, q,  a,   b,  R)-->
 	<h1>Phong Shaded Torus with Spatially Varying Material Properties</h1>
 
-	<canvas id="myCanvas" width="400" height="400"></canvas><br />
+	<canvas id="myCanvas" width="450" height="450"></canvas><br />
 	Click and drag to rotate<br>
 
-<input min="1" max="10" value="2" oninput="changeTube('p', this)" onchange="changeTube('p', this)" type="range">p - winds around origin
+<input min="1" max="10" value="2" oninput="changeTube('p', this)" onchange="changeTube('p', this)" type="range">winds around origin
 <label id="p">2</label><br>
 <input min="1" max="15" value="5" oninput="changeTube('q', this)" onchange="changeTube('q', this)" type="range">number of coils
 <label id="q">5</label><br>
+<!--
+<input min="1" max="600" value="300" oninput="changeTube('N', this)" onchange="changeTube('N', this)" type="range">N (default = 300)
+<label id="N">300</label><br>
+
+<input min="1" max="300" value="128" oninput="changeTube('M', this)" onchange="changeTube('M', this)" type="range">M (default = 128)
+<label id="M">128</label><br>
+
+<input min="1" max="15" value="6" oninput="changeTube('a', this)" onchange="changeTube('a', this)" type="range">a (6 = default)
+<label id="a">6</label><br>
+-->
+<input min="1" max="15" value="2" oninput="changeTube('b', this)" onchange="changeTube('b', this)" type="range">b (2 = default)
+<label id="b">2</label><br>
+
+<input min="1" max="15" value="1" oninput="changeTube('R', this)" onchange="changeTube('R', this)" type="range">R (1 = default)
+<label id="R">1</label><br>
+
+
 
 <script>
 	function changeTube(label, factor){    
 		if(label == 'p'){  
 			tube.p = factor.value;
 			document.getElementById('p').innerHTML = factor.value;
-		}else{
+		}else if(label == 'q'){
 			tube.q = factor.value;
 			document.getElementById('q').innerHTML = factor.value;
+		}else if(label == 'a'){
+			tube.a = factor.value;
+			document.getElementById('a').innerHTML = factor.value;
+		}else if(label == 'b'){
+			tube.b = factor.value;
+			document.getElementById('b').innerHTML = factor.value;
+		}else if(label == 'R'){
+			tube.R = factor.value;
+			document.getElementById('R').innerHTML = factor.value;
+		}else if(label == 'N'){
+			tube.N = factor.value;
+			document.getElementById('N').innerHTML = factor.value;
+		}else if(label == 'M'){
+			tube.M = factor.value;
+			document.getElementById('M').innerHTML = factor.value;
 		};
 		tube.createGeometry();
 		tube.createTriangleStrip();
